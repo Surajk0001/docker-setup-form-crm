@@ -1,13 +1,14 @@
 services:
   mariadb:
     image: mariadb:10.8
+    # ... (aapka baaki config same rahega)
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --skip-character-set-client-handshake
       - --skip-innodb-read-only-compressed
     environment:
-      MYSQL_ROOT_PASSWORD: admin@123
+      MYSQL_ROOT_PASSWORD: 123
     volumes:
       - mariadb-data:/var/lib/mysql
     networks:
@@ -21,15 +22,19 @@ services:
     restart: unless-stopped
 
   frappe:
-    image: frappe/bench:latest
-    command: bash /workspace/init.sh
+    image: frappe/crm:stable  # <-- Yahan official image use karo
+    # command: bash /workspace/init.sh  <-- Yeh line hata do
     working_dir: /home/frappe/frappe-bench
     environment:
       - SHELL=/bin/bash
       - SITE_NAME=crm.growthkulagency.com
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - REDIS_CACHE=redis://redis:6379
+      - REDIS_QUEUE=redis://redis:6379
     volumes:
-      - ./init.sh:/workspace/init.sh
       - frappe-sites:/home/frappe/frappe-bench/sites
+      # - ./init.sh:/workspace/init.sh  <-- Yeh line bhi hata do
     ports:
       - "8000:8000"
     networks:
