@@ -1,6 +1,3 @@
-version: "3.7"
-name: crm
-
 services:
   mariadb:
     image: mariadb:10.8
@@ -10,28 +7,41 @@ services:
       - --skip-character-set-client-handshake
       - --skip-innodb-read-only-compressed
     environment:
-      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: xxx
     volumes:
       - mariadb-data:/var/lib/mysql
+    networks:
+      - internal_net
     restart: unless-stopped
 
   redis:
     image: redis:alpine
+    networks:
+      - internal_net
     restart: unless-stopped
 
   frappe:
     image: frappe/bench:latest
     command: bash /workspace/init.sh
+    working_dir: /home/frappe/frappe-bench
     environment:
       - SHELL=/bin/bash
-    working_dir: /home/frappe/frappe-bench
+      - SITE_NAME=crm.growthkulagency.com
     volumes:
       - ./init.sh:/workspace/init.sh
       - frappe-sites:/home/frappe/frappe-bench/sites
     ports:
-      - 8000:8000
+      - "8000:8000"
+    networks:
+      - internal_net
+      - dokploy-network
     restart: unless-stopped
 
 volumes:
   mariadb-data:
   frappe-sites:
+
+networks:
+  internal_net:
+  dokploy-network:
+    external: true
