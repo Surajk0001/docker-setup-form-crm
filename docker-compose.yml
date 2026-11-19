@@ -7,7 +7,7 @@ services:
       - --skip-character-set-client-handshake
       - --skip-innodb-read-only-compressed
     environment:
-      MYSQL_ROOT_PASSWORD: xxx
+      MYSQL_ROOT_PASSWORD: admin@123
     volumes:
       - mariadb-data:/var/lib/mysql
     networks:
